@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.vite/
+
+# miniprogram-ci upload keys must never enter git
+.private.*.key
+*.private.key
+
+# Build output
+web-preview/dist/
+
+# OS junk
+.DS_Store
+Thumbs.db

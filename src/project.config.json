@@ -1,0 +1,26 @@
+{
+  "description": "WeChat mini game — OceanDino multisite",
+  "appid": "touristappid",
+  "projectname": "wxgame",
+  "setting": {
+    "es6": true,
+    "enhance": true,
+    "postcss": false,
+    "minified": true,
+    "useCompilerPlugins": false,
+    "uglifyFileName": false,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
+  },
+  "compileType": "game",
+  "libVersion": "3.5.5",
+  "appType": "game",
+  "scripts": {
+    "beforeCompile": "",
+    "beforePreview": "",
+    "beforeUpload": ""
+  }
+}
