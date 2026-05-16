@@ -71,31 +71,34 @@ Phaser 3 在 source 里有大量 `window` / `document` / `HTMLImageElement` /
 
 ## Production publish
 
-通过 `miniprogram-ci` 把 `src/` 上传到微信小游戏后台：
+通过 OceanDino dashboard 的 **WxGame · 小游戏 → Upload (体验版) / Submit (提审)** 按钮，
+后端会调 `miniprogram-ci` 把 `src/` 上传到微信小游戏后台。一次性准备工作：
+
+1. 在 [mp.weixin.qq.com](https://mp.weixin.qq.com) 注册 **小游戏** appid
+   （注意类型，小游戏 ≠ 小程序）。
+2. 开发 → 开发设置 → 小程序代码上传：生成上传密钥（下载
+   `.private.<appid>.key`），同页面把 ECS 出口 IP 加入白名单。
+3. Dashboard 的「凭据」卡片上传 appid + key 文件（AES-256-GCM 加密存
+   Supabase；运行时仅落到 ECS `/dev/shm` 内存盘，命令结束即删）。
+4. 把 `src/project.config.json` 里的占位 `"touristappid"` 改为真实 appid。
+
+完成后每次 ship 都是「点 Upload → 扫二维码」，**不需要打开微信开发者工具**。
+本仓库 `web-preview/` 永远只做 vibe coding 期浏览器预览（含 Phaser scene），
+不参与微信平台发布。
+
+如需手动 CLI：
 
 ```bash
 # 上传体验版
-npx miniprogram-ci upload \
+npx -y miniprogram-ci upload \
   --pp ./src \
   --pkp ./.private.<appid>.key \
   --appid <appid> \
   -v 0.0.1 \
   --desc "from oceandino dashboard"
-
-# 提审正式版
-npx miniprogram-ci submit-audit \
-  --pp ./src \
-  --pkp ./.private.<appid>.key \
-  --appid <appid>
 ```
 
-**注意**：
-
-- 真实 appid 替换 `src/project.config.json` 里的 `"touristappid"` 占位
-- `.private.<appid>.key` 不能进 git（已加 .gitignore）
-- 上传前在微信公众平台的"开发管理 → 开发设置 → 小程序代码上传"开启服务端 CI 并加 ECS IP 白名单
-
-本仓库 `web-preview/` 仅供 dev 期看效果，不参与微信平台发布。
+完整集成设计见 `oceandino/docs/work-logs/2026-05/miniprogram-ci-integration.md`。
 
 ## 不在此仓库做的事
 
