@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# v23.6 site-vibecode push guard. See:
+#   docs/architecture/site-vibecode-isolation.md §7.2 (lives in oceandino repo)
+#
+# Refuses any push whose remote URL doesn't match this site's expected
+# repo slug. Stops a stray ``git push other-remote`` from cross-contaminating
+# repos.
+set -euo pipefail
+
+EXPECTED_SLUG="wxgame"
+remote_name="$1"
+remote_url="$2"
+
+# Allow the bypass envar so an operator can override in an emergency.
+if [[ "${OCEANDINO_BYPASS_PUSH_GUARD:-}" == "1" ]]; then
+    printf >&2 "[pre-push] OCEANDINO_BYPASS_PUSH_GUARD=1 — skipping URL check (logged).\n"
+    logger -t oceandino-push-guard "BYPASS: $remote_name $remote_url"
+    exit 0
+fi
+
+# Accept https://github.com/.../<slug>(.git)? and git@github.com:.../<slug>(.git)?
+if [[ "$remote_url" =~ [/:]${EXPECTED_SLUG}(\.git)?$ ]]; then
+    exit 0
+fi
+
+cat >&2 <<EOF
+[pre-push] BLOCKED: refusing to push from ${EXPECTED_SLUG} repo to "${remote_url}".
+
+This site's vibecode is restricted to its own remote (must end in
+"/${EXPECTED_SLUG}" or "/${EXPECTED_SLUG}.git"). To override in an emergency,
+set OCEANDINO_BYPASS_PUSH_GUARD=1 before pushing.
+EOF
+exit 1
